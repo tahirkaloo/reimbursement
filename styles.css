@@ -1,0 +1,83 @@
+.banner-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner {
+  display: inline-block;
+  position: relative;
+  width: 30%;
+  height: 300px;
+  margin: 1.5%;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center center;
+  transition: all 0.3s ease;
+}
+
+.banner:hover {
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+}
+
+.banner:hover h2 {
+  color: black;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.banner h2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  background-color: rgba(34, 34, 34, 0.8); /* Change the background color to a darker shade */
+  transition: all 0.3s ease;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5); /* Add its own shadows */
+}
+
+.banner.banner1 {
+  background-image: url('https://reimbursement-instance-bucket.s3.amazonaws.com/hanover-banner-fuel');
+}
+
+.banner.banner2 {
+  background-image: url('https://reimbursement-instance-bucket.s3.amazonaws.com/Hanover+hotel+banner.png');
+}
+
+.banner.banner3 {
+  background-image: url('https://reimbursement-instance-bucket.s3.amazonaws.com/Incentive+banner+logo.png');
+}
+
+.banner h2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  background-color: rgba(0, 0, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.banner:hover h2 {
+  color: black; /* Change the text color to black */
+  background-color: rgba(0, 128, 255, 0.7);
+}
+
+
+@media screen and (max-width: 768px) {
+  .banner {
+    width: 100%;
+    height: auto;
+    margin: 20px 0;
+  }
+}
+

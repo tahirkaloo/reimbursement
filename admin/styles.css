@@ -1,0 +1,112 @@
+/* Navbar styles */
+.navbar {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.logo img {
+  height: 40px;
+  margin-right: 10px;
+}
+
+.menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.menu li {
+  margin-right: 10px;
+}
+
+.menu li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Admin panel styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-navbar {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-navbar .navbar-brand {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* Metric styles */
+.admin-metric {
+  display: inline-block;
+  background-color: #f8f8f8;
+  padding: 10px 20px;
+  margin-right: 20px;
+  border-radius: 4px;
+}
+
+.admin-metric-label {
+  margin: 0;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.admin-metric-value {
+  margin: 0;
+  font-size: 24px;
+}
+
+/* Response card styles */
+.response-card {
+  background-color: #f8f8f8;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.response-details {
+  font-size: 14px;
+}
+
+.response-details p {
+  margin: 5px 0;
+}
+
+/* Index page banners design */
+.card-icon img {
+  width: 50px; /* Adjust the width as needed */
+  height: 50px; /* Adjust the height as needed */
+}
+
+/* Add more custom styles as needed */
+
