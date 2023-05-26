@@ -59,7 +59,7 @@ if (isset($_POST['login'])) {
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
         /* Additional CSS styles for login page */
         .container {
