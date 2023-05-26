@@ -9,6 +9,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error = false;
+$errorMessage = '';
 
 // Check if the login form is submitted
 if (isset($_POST['login'])) {
@@ -164,11 +165,11 @@ if (isset($_POST['login'])) {
     <div class="container">
         <h2>Login</h2>
 
-        <?php if (isset($errorMessage)): ?>
+        <?php if (!empty($errorMessage)): ?>
             <div class="error-message"><?php echo $errorMessage; ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email" required>
