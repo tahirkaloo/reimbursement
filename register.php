@@ -3,12 +3,8 @@ session_start();
 require_once 'db_connect.php';
 
 // Do reporting
-error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-// Log PHP errors to a file (optional)
-ini_set('log_errors', 1);
-ini_set('error_log', 'php_errors.log');
+error_reporting(E_ALL);
 
 // Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
@@ -44,7 +40,7 @@ if (isset($_POST['register'])) {
         mysqli_stmt_bind_param($checkStmt, "s", $email);
         mysqli_stmt_execute($checkStmt);
         mysqli_stmt_store_result($checkStmt);
-        
+
         if (mysqli_stmt_num_rows($checkStmt) > 0) {
             $error = true;
             $errorMessage = "User with this email already exists.";
@@ -73,12 +69,11 @@ if (isset($_POST['register'])) {
                 error_log("Error preparing statement: " . mysqli_error($conn));
             }
         }
-        
+
         // Close the check statement
         mysqli_stmt_close($checkStmt);
     }
 }
-
 ?>
 
 
@@ -89,6 +84,31 @@ if (isset($_POST['register'])) {
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
         /* Additional CSS styles for registration page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .navbar a:first-child {
+            margin-left: 0;
+        }
+
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -132,38 +152,47 @@ if (isset($_POST['register'])) {
     </style>
 </head>
 <body>
-<!-- Include the navbar -->
-<?php include 'navbar.html'; ?>
-    <div class="container">
-        <h2>Registration</h2>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" name="name" id="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password" required>
-            </div>
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" name="confirm_password" id="confirm_password" required>
-            </div>
-            <div class="form-group">
-                <button type="submit" name="register">Register</button>
-            </div>
-            <?php if ($error): ?>
-                <p class="error-message"><?php echo $errorMessage; ?></p>
-            <?php elseif ($successMessage): ?>
-                <p class="success-message"><?php echo $successMessage; ?></p>
-            <?php endif; ?>
-        </form>
-        <p>Already have an account? <a href="login.php">Log in</a></p>
+<!-- Login Navbar -->
+<div class="navbar">
+    <div>
+        <a href="index.html">Home</a>
     </div>
+    <div>
+        <a href="register.php">Register</a>
+        <a href="login.php">Login</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Registration</h2>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" name="register">Register</button>
+        </div>
+        <?php if ($error): ?>
+            <p class="error-message"><?php echo $errorMessage; ?></p>
+        <?php elseif ($successMessage): ?>
+            <p class="success-message"><?php echo $successMessage; ?></p>
+        <?php endif; ?>
+    </form>
+    <p>Already have an account? <a href="login.php">Log in</a></p>
+</div>
 </body>
 </html>
 

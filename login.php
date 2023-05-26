@@ -62,6 +62,27 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
         /* Additional CSS styles for login page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -100,28 +121,37 @@ if (isset($_POST['login'])) {
     </style>
 </head>
 <body>
-<!-- Include the navbar -->
-<?php include 'navbar.php'; ?>
-    <div class="container">
-        <h2>Login</h2>
-        <?php if ($error): ?>
-            <p class="error-message"><?php echo $errorMessage; ?></p>
-        <?php endif; ?>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password" required>
-            </div>
-            <div class="form-group">
-                <button type="submit" name="login">Login</button>
-            </div>
-        </form>
-        <p>Don't have an account? <a href="register.php">Register</a></p>
+<!-- Login Navbar -->
+<div class="navbar">
+    <div>
+        <a href="index.html">Home</a>
     </div>
+    <div>
+        <a href="register.php">Register</a>
+        <a href="login.php">Login</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Login</h2>
+    <?php if ($error): ?>
+        <p class="error-message"><?php echo $errorMessage; ?></p>
+    <?php endif; ?>
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" name="login">Login</button>
+        </div>
+    </form>
+    <p>Don't have an account? <a href="register.php">Register</a></p>
+</div>
 </body>
 </html>
 
