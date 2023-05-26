@@ -100,6 +100,8 @@ if (isset($_POST['login'])) {
     </style>
 </head>
 <body>
+<!-- Include the navbar -->
+<?php include 'navbar.html'; ?>
     <div class="container">
         <h2>Login</h2>
         <?php if ($error): ?>

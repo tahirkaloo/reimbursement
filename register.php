@@ -132,6 +132,8 @@ if (isset($_POST['register'])) {
     </style>
 </head>
 <body>
+<!-- Include the navbar -->
+<?php include 'navbar.html'; ?>
     <div class="container">
         <h2>Registration</h2>
         <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
