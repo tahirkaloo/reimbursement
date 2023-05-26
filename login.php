@@ -3,8 +3,8 @@ session_start();
 require_once 'db_connect.php';
 
 // Do reporting
-error_reporting(E_ALL);
 ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 // Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
@@ -101,7 +101,7 @@ if (isset($_POST['login'])) {
 </head>
 <body>
 <!-- Include the navbar -->
-<?php include 'navbar.html'; ?>
+<?php include 'navbar.php'; ?>
     <div class="container">
         <h2>Login</h2>
         <?php if ($error): ?>
