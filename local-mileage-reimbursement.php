@@ -20,7 +20,8 @@ if (!isset($_SESSION['user_id'])) {
   <script src="reimbursement.js"></script>
 </head>
 <body>
-  <?php include 'navbar.html'; ?>
+  <!-- Include the navbar -->
+  <?php include 'navbar.php'; ?>
   <style>
     .navbar-nav.ml-auto {
       justify-content: flex-end;
