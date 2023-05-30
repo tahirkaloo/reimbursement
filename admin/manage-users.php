@@ -111,43 +111,92 @@ function getUserEmail($userId) {
 <html>
 <head>
     <title>Manage Users</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <style>
+        /* Additional CSS styles for manage-users page */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        form {
+            display: inline-block;
+        }
+
+        .btn-make-admin,
+        .btn-remove-admin,
+        .btn-reset-password,
+        .btn-delete-account {
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-remove-admin {
+            background-color: #f44336;
+        }
+
+        .btn-make-admin:hover,
+        .btn-remove-admin:hover,
+        .btn-reset-password:hover,
+        .btn-delete-account:hover {
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-    <?php if (!$isAdmin) : ?>
-        <h1>Access Denied</h1>
-        <p>You do not have permission to access this page.</p>
-    <?php else : ?>
+    <?php include 'admin-navbar.php'; ?>
+
+    <div class="container">
         <h1>Manage Users</h1>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-            <?php foreach ($users as $user) : ?>
+        <?php if (!$isAdmin) : ?>
+            <h2>Access Denied</h2>
+            <p>You do not have permission to access this page.</p>
+        <?php else : ?>
+            <table>
                 <tr>
-                    <td><?php echo $user['user_id']; ?></td>
-                    <td><?php echo $user['username']; ?></td>
-                    <td><?php echo $user['email']; ?></td>
-                    <td><?php echo $user['role']; ?></td>
-                    <td>
-                        <form method="POST">
-                            <input type="hidden" name="userId" value="<?php echo $user['user_id']; ?>">
-                            <?php if ($user['role'] === 'user') : ?>
-                                <button type="submit" name="makeAdmin">Make Admin</button>
-                            <?php else : ?>
-                                <button type="submit" name="removeAdmin">Remove Admin</button>
-                            <?php endif; ?>
-                            <button type="submit" name="resetPassword">Reset Password</button>
-                            <button type="submit" name="deleteAccount">Delete Account</button>
-                        </form>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+                <?php foreach ($users as $user) : ?>
+                    <tr>
+                        <td><?php echo $user['user_id']; ?></td>
+                        <td><?php echo $user['username']; ?></td>
+                        <td><?php echo $user['email']; ?></td>
+                        <td><?php echo $user['role']; ?></td>
+                        <td>
+                            <form method="POST">
+                                <input type="hidden" name="userId" value="<?php echo $user['user_id']; ?>">
+                                <?php if ($user['role'] === 'user') : ?>
+                                    <button class="btn-make-admin" type="submit" name="makeAdmin">Make Admin</button>
+                                <?php else : ?>
+                                    <button class="btn-remove-admin" type="submit" name="removeAdmin">Remove Admin</button>
+                                <?php endif; ?>
+                                <button class="btn-reset-password" type="submit" name="resetPassword">Reset Password</button>
+                                <button class="btn-delete-account" type="submit" name="deleteAccount">Delete Account</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php endif; ?>
+    </div>
 </body>
 </html>
 
