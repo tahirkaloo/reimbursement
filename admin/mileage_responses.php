@@ -25,7 +25,7 @@ try {
   <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<?php include 'admin-navbar.php'; ?>
+  <?php include 'admin-navbar.php'; ?>
   <div class="container">
     <h1>Mileage Responses</h1>
 
@@ -41,6 +41,9 @@ try {
             <th>Destination</th>
             <th>Multiple Stops</th>
             <th>Purpose</th>
+            <?php if ($_SESSION['user_level'] === 'manager') : ?>
+              <th>Action</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +57,20 @@ try {
               <td><?php echo $response['destination']; ?></td>
               <td><?php echo $response['multiple_stops']; ?></td>
               <td><?php echo $response['purpose']; ?></td>
+              <?php if ($_SESSION['user_level'] === 'manager') : ?>
+                <td>
+                  <!-- Approve button -->
+                  <form method="POST" action="approve.php">
+                    <input type="hidden" name="response_id" value="<?php echo $response['id']; ?>">
+                    <button type="submit" class="btn btn-success">Approve</button>
+                  </form>
+                  <!-- Reject button -->
+                  <form method="POST" action="reject.php">
+                    <input type="hidden" name="response_id" value="<?php echo $response['id']; ?>">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                  </form>
+                </td>
+              <?php endif; ?>
             </tr>
           <?php endforeach; ?>
         </tbody>
