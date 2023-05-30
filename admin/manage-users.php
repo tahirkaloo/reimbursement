@@ -36,6 +36,7 @@ if (isset($_POST['makeAdmin']) || isset($_POST['removeAdmin'])) {
 }
 
 // Check if the form is submitted for resetting the user's password
+// Check if the form is submitted for resetting the user's password
 if (isset($_POST['resetPassword'])) {
     $userId = $_POST['userId'];
 
@@ -46,7 +47,7 @@ if (isset($_POST['resetPassword'])) {
     // Replace the following code with your own logic
     $query = "UPDATE users SET password = ? WHERE user_id = ?";
     $stmt = $conn->prepare($query);
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+    $hashedPassword = md5($newPassword); // Hash the new password using md5
     $stmt->bind_param("si", $hashedPassword, $userId);
     $stmt->execute();
 
@@ -61,6 +62,7 @@ if (isset($_POST['resetPassword'])) {
         mail($email, $subject, $message);
     }
 }
+
 
 // Check if the form is submitted for deleting the user's account
 if (isset($_POST['deleteAccount'])) {
