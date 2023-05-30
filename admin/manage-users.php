@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Include the database connection file
 require_once "../db_connect.php";
 
@@ -12,12 +16,6 @@ if (!isset($_SESSION['user_id'])) {
 // Check if the user is an admin
 // Replace the condition below with your own logic to determine if the user is an admin
 $isAdmin = ($_SESSION['role'] === 'admin');
-
-// Debug information
-var_dump($_SESSION['role']);
-var_dump($isAdmin);
-var_dump($_SESSION['user_id']);
-var_dump($_SESSION);
 
 // Check if the form is submitted for making a user admin or removing admin access
 if (isset($_POST['makeAdmin']) || isset($_POST['removeAdmin'])) {
