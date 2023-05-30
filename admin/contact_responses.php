@@ -24,7 +24,7 @@ try {
   <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-  <?php include 'admin_navbar.html'; ?>
+  <?php include 'admin-navbar.php'; ?>
   <div class="admin-container">
     <div class="admin-header">
       <h1>Contact Responses</h1>

@@ -25,7 +25,7 @@ try {
   <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<?php include 'admin_navbar.html'; ?>
+<?php include 'admin-navbar.php'; ?>
   <div class="container">
     <h1>Mileage Responses</h1>
 
