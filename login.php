@@ -18,7 +18,44 @@ if (isset($_POST['login'])) {
     if (empty($email) || empty($password)) {
         $error = true;
         $errorMessage = "Email and password are required.";
+    } elseif (isset($_POST['resetPassword'])) {
+        // Handle password reset request
+        $query = "SELECT user_id FROM users WHERE email = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows == 1) {
+            // Generate a new password
+            $newPassword = generateRandomPassword(); // Implement your own logic to generate a new password
+
+            // Update the user's password in the database
+            $hashedPassword = md5($newPassword); // Hash the new password using md5()
+            $stmt->bind_result($userId);
+            $stmt->fetch();
+            $stmt->close();
+
+            $updateQuery = "UPDATE users SET password = ? WHERE user_id = ?";
+            $updateStmt = $conn->prepare($updateQuery);
+            $updateStmt->bind_param("si", $hashedPassword, $userId);
+            $updateStmt->execute();
+            $updateStmt->close();
+
+            // Send the new password to the user via email or any other method
+            $subject = "Password Reset";
+            $message = "Your new password: $newPassword";
+            // Send the email using your preferred email sending method
+            // Replace the following code with your own logic
+            mail($email, $subject, $message);
+
+            $successMessage = "Your password has been reset. Please check your email for the new password.";
+        } else {
+            $error = true;
+            $errorMessage = "Invalid email. Please try again.";
+        }
     } else {
+        // Authenticate the user
         $stmt = mysqli_prepare($conn, "SELECT user_id, email, password, role FROM users WHERE email = ?");
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
@@ -110,6 +147,11 @@ if (isset($_POST['login'])) {
             color: red;
             margin-top: 5px;
         }
+
+        .success-message {
+            color: green;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -128,6 +170,8 @@ if (isset($_POST['login'])) {
     <h2>Login</h2>
     <?php if ($error): ?>
         <p class="error-message"><?php echo $errorMessage; ?></p>
+    <?php elseif (isset($successMessage)): ?>
+        <p class="success-message"><?php echo $successMessage; ?></p>
     <?php endif; ?>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
         <div class="form-group">
@@ -140,6 +184,9 @@ if (isset($_POST['login'])) {
         </div>
         <div class="form-group">
             <button type="submit" name="login">Login</button>
+        </div>
+        <div class="form-group">
+            <button type="submit" name="resetPassword">Reset Password</button>
         </div>
     </form>
     <p>Don't have an account? <a href="register.php">Register</a></p>
