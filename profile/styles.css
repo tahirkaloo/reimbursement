@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f1f1f1;
+}
+
+.tabs {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tabs li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tabs li.active {
+  background-color: #ddd;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+}
+

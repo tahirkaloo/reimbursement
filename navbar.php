@@ -30,6 +30,9 @@ $isLoggedIn = isset($_SESSION['user_id']);
           <a class="nav-link" href="admin">Admin</a>
 	</li>
 	<li class="nav-item">
+          <a class="nav-link" href="/profile/profile.php">Profile</a>
+        </li>
+	<li class="nav-item">
           <a class="nav-link" href="logout.php">Logout</a>
         </li>
       <?php } else { ?>
