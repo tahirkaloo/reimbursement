@@ -27,10 +27,10 @@ $isLoggedIn = isset($_SESSION['user_id']);
       </li>
       <?php if ($isLoggedIn) { ?>
         <li class="nav-item">
-          <a class="nav-link" href="logout.php">Logout</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="admin">Admin</a>
+	</li>
+	<li class="nav-item">
+          <a class="nav-link" href="logout.php">Logout</a>
         </li>
       <?php } else { ?>
         <li class="nav-item">

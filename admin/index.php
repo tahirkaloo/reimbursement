@@ -105,15 +105,21 @@ $totalContactResponses = 5;
     <div class="admin-content">
       <div class="admin-card" onclick="window.location.href='mileage_responses.php';">
         <div class="card-icon">
-          <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/hanover-banner-fuel" alt="Mileage Icon">
+          <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/admin-card-localmileageresponses.gif" alt="Mileage Icon">
         </div>
         <div class="card-title">Mileage Responses</div>
       </div>
       <div class="admin-card" onclick="window.location.href='contact_responses.php';">
         <div class="card-icon">
-          <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Admin+Contact+Us+index.png" alt="Contact Icon">
+          <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Admin+Contact+Us+index.gif" alt="Contact Icon">
         </div>
         <div class="card-title">Contact Form Responses</div>
+      </div>
+      <div class="admin-card" onclick="window.location.href='manage-users.php';">
+        <div class="card-icon">
+          <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Admin+manage+users.gif" alt="Manage Users Icon">
+        </div>
+        <div class="card-title">Manage Users</div>
       </div>
       <!-- Add more cards for other response pages -->
     </div>
