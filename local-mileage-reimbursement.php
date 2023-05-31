@@ -6,8 +6,40 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php"); // Redirect to the login page
     exit;
 }
-?>
 
+// Check if the form was submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the form data
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+    $tollsParking = $_POST['tolls-parking'];
+    $origin = $_POST['origin'];
+    $destination = $_POST['destination'];
+    $multipleStops = isset($_POST['multiple-stops']) ? $_POST['multiple-stops'] : [];
+    $mileage = $_POST['mileage'];
+    $purpose = $_POST['purpose'];
+
+    // Connect to the database
+    require_once('db_connect.php');
+
+    // Prepare the SQL statement
+    $stmt = $mysqli->prepare("INSERT INTO mileage_reimbursement (user_id, name, date, tolls_parking, origin, destination, multiple_stops, mileage, purpose, manager_approval, manager_id, finance_approval, finance_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NULL, 'Pending', NULL)");
+
+    // Bind parameters and execute the statement for each row
+    foreach ($date as $index => $value) {
+        $stmt->bind_param("sssssssss", $_SESSION['user_id'], $name, $value, $tollsParking[$index], $origin[$index], $destination[$index], $multipleStops[$index], $mileage[$index], $purpose[$index]);
+        $stmt->execute();
+    }
+
+    // Close the statement and database connection
+    $stmt->close();
+    $mysqli->close();
+
+    // Redirect to the confirmation page
+    header("Location: confirmation.php");
+    exit;
+}
+?>
 
 <!DOCTYPE html>
 <html>
@@ -33,7 +65,7 @@ if (!isset($_SESSION['user_id'])) {
       <!-- Add any necessary header content here -->
     </div>
 
-    <form id="reimbursement-form" method="post" action="submit_form.php" enctype="multipart/form-data">
+    <form id="reimbursement-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
       <!-- Form fields and table code here -->
       <div class="form-group">
         <label for="name">Name:</label>

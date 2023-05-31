@@ -17,54 +17,97 @@ if (!isset($_SESSION['user_id'])) {
 // Replace the condition below with your own logic to determine if the user is an admin
 $isAdmin = ($_SESSION['role'] === 'admin');
 
-// Check if the form is submitted for managing user actions
-if (isset($_POST['manageUser'])) {
+// Check if the form is submitted for changing the user's role
+if (isset($_POST['action']) && $_POST['action'] === 'changeRole') {
     $userId = $_POST['userId'];
-    $action = $_POST['manageUserAction'];
+    $role = $_POST['role'];
 
-    if ($action === 'deleteUser') {
-        // Perform the necessary database operations to delete the user's account
-        // Replace the following code with your own logic
-        $query = "DELETE FROM users WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-    } elseif ($action === 'resetPassword') {
-        // Generate a new password
-        $newPassword = generateRandomPassword(); // Implement your own logic to generate a new password
+    // Perform the necessary database operations to update the user's role
+    // Replace the following code with your own logic
+    $query = "UPDATE users SET role = ? WHERE user_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $role, $userId);
+    $stmt->execute();
+}
 
-        // Perform the necessary database operations to update the user's password
-        // Replace the following code with your own logic
-        $query = "UPDATE users SET password = ? WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $hashedPassword = md5($newPassword); // Hash the new password using md5
-        $stmt->bind_param("si", $hashedPassword, $userId);
-        $stmt->execute();
+// Check if the form is submitted for resetting the user's password
+if (isset($_POST['action']) && $_POST['action'] === 'resetPassword') {
+    $userId = $_POST['userId'];
 
-        // Send the new password to the user via email or any other method
-        // Replace the following code with your own logic
-        $email = getUserEmail($userId); // Implement your own logic to retrieve the user's email
-        if ($email) {
-            $subject = "Password Reset";
-            $message = "Your new password: $newPassword";
-            // Send the email using your preferred email sending method
-            // Replace the following code with your own logic
-            mail($email, $subject, $message);
-        }
-    } elseif (in_array($action, ['admin', 'manager', 'finance'])) {
-        // Perform the necessary database operations to update the user's role
-        // Replace the following code with your own logic
-        $query = "UPDATE users SET role = ? WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("si", $action, $userId);
-        $stmt->execute();
+    // Generate a new password
+    $newPassword = generateRandomPassword(); // Implement your own logic to generate a new password
+
+    // Perform the necessary database operations to update the user's password
+    // Replace the following code with your own logic
+    $query = "UPDATE users SET password = ? WHERE user_id = ?";
+    $stmt = $conn->prepare($query);
+    $hashedPassword = md5($newPassword); // Hash the new password using md5
+    $stmt->bind_param("si", $hashedPassword, $userId);
+    $stmt->execute();
+
+    // Send the new password to the user via email or any other method
+    // Replace the following code with your own logic
+    $email = getUserEmail($userId); // Implement your own logic to retrieve the user's email
+    if ($email) {
+        sendEmail($email, $newPassword);
     }
+}
+
+// Check if the form is submitted for deleting the user's account
+if (isset($_POST['action']) && $_POST['action'] === 'deleteAccount') {
+    $userId = $_POST['userId'];
+
+    // Perform the necessary database operations to delete the user's account
+    // Replace the following code with your own logic
+    $query = "DELETE FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
 }
 
 // Get all users from the database
 $query = "SELECT * FROM users";
 $result = mysqli_query($conn, $query);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+// Helper function to generate a random password
+function generateRandomPassword()
+{
+    // Implement your own logic to generate a random password
+    // This is just a simple example
+    $length = 8;
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    return $password;
+}
+
+// Helper function to retrieve the user's email
+function getUserEmail($userId)
+{
+    // Implement your own logic to retrieve the user's email
+    // Replace the following code with your own logic
+    global $conn; // Added to access the global connection variable
+    $query = "SELECT email FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['email'];
+}
+
+// Helper function to send email
+function sendEmail($email, $password)
+{
+    // Implement your own logic to send the email
+    // Replace the following code with your own logic
+    $subject = "Password Reset";
+    $message = "Your new password: $password";
+    mail($email, $subject, $message);
+}
 ?>
 
 <!DOCTYPE html>
@@ -93,32 +136,42 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
             display: inline-block;
         }
 
-        .btn-make-admin,
-        .btn-make-manager,
-        .btn-make-finance,
-        .btn-reset-password,
-        .btn-delete-account {
+        .btn-action {
             background-color: #4CAF50;
             color: white;
             padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-right: 5px;
         }
 
-        .btn-remove-manager,
-        .btn-remove-finance {
-            background-color: #f44336;
-        }
-
-        .btn-make-admin:hover,
-        .btn-make-manager:hover,
-        .btn-make-finance:hover,
-        .btn-reset-password:hover,
-        .btn-delete-account:hover,
-        .btn-remove-manager:hover,
-        .btn-remove-finance:hover {
+        .btn-action:hover {
             opacity: 0.8;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            padding: 5px;
+        }
+
+        .dropdown-option {
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
     </style>
 </head>
@@ -144,23 +197,62 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <td><?php echo $user['user_id']; ?></td>
                         <td><?php echo $user['username']; ?></td>
                         <td><?php echo $user['email']; ?></td>
-                        <td><?php echo $user['role']; ?></td>
                         <td>
-                            <form method="POST">
+                            <div class="dropdown" id="dropdown-<?php echo $user['user_id']; ?>">
+                                <button class="btn-action"><?php echo $user['role']; ?></button>
+                                <div class="dropdown-content">
+				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'admin')">Admin</div>
+				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'Finance')">Finance</div>
+				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'manager')">Manager</div>
+                                    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'user')">User</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <form method="post" onsubmit="return confirm('Are you sure?');">
                                 <input type="hidden" name="userId" value="<?php echo $user['user_id']; ?>">
-                                <select name="manageUserAction">
-                                    <option value="admin">Admin</option>
-                                    <option value="manager">Manager</option>
-                                    <option value="finance">Finance</option>
-                                </select>
-                                <button class="btn-make-admin" type="submit" name="manageUser">Make Role</button>
-                                <button class="btn-reset-password" type="submit" name="manageUserAction" value="resetPassword">Reset Password</button>
-                                <button class="btn-delete-account" type="submit" name="manageUserAction" value="deleteUser">Delete Account</button>
+                                <input type="hidden" name="action" value="resetPassword">
+                                <button class="btn-action" type="submit">Reset Password</button>
+                            </form>
+                            <form method="post" onsubmit="return confirm('Are you sure?');">
+                                <input type="hidden" name="userId" value="<?php echo $user['user_id']; ?>">
+                                <input type="hidden" name="action" value="deleteAccount">
+                                <button class="btn-action" type="submit">Delete Account</button>
                             </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </table>
+
+            <script>
+                // JavaScript function to handle changing the user's role
+                function changeRole(userId, role) {
+                    document.getElementById("dropdown-" + userId).innerHTML = role;
+                    document.getElementById("dropdown-" + userId).style.display = "block";
+
+                    // Create a hidden form and submit it to change the user's role
+                    var form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "";
+                    var inputUserId = document.createElement("input");
+                    inputUserId.type = "hidden";
+                    inputUserId.name = "userId";
+                    inputUserId.value = userId;
+                    var inputRole = document.createElement("input");
+                    inputRole.type = "hidden";
+                    inputRole.name = "role";
+                    inputRole.value = role;
+                    var inputAction = document.createElement("input");
+                    inputAction.type = "hidden";
+                    inputAction.name = "action";
+                    inputAction.value = "changeRole";
+                    form.appendChild(inputUserId);
+                    form.appendChild(inputRole);
+                    form.appendChild(inputAction);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            </script>
         <?php endif; ?>
     </div>
 </body>
