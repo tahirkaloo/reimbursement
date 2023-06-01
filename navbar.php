@@ -6,8 +6,8 @@ $isLoggedIn = isset($_SESSION['user_id']);
 ?>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-  <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/hanover.jpg" alt="Logo" height="100">
-  <a class="navbar-brand" href="#">Hanover County</a>
+  <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Logo+files/logo-no-background.png" alt="Logo" height="100">
+  <a class="navbar-brand" href="#">Reimbursement Portal</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -30,7 +30,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
           <a class="nav-link" href="admin">Admin</a>
 	</li>
 	<li class="nav-item">
-          <a class="nav-link" href="/profile/profile.php">Profile</a>
+          <a class="nav-link" href="/profile/index.php">Profile</a>
         </li>
 	<li class="nav-item">
           <a class="nav-link" href="logout.php">Logout</a>

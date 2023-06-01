@@ -70,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Profile</title>
   <link rel="stylesheet" type="text/css" href="../styles.css">
   <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* CSS styles here */
+  </style>
 </head>
 <body>
   <?php include '../navbar.html'; ?>
@@ -94,13 +97,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="#">
           <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="<?php echo $user['name']; ?>" required>
+            <input type="text" class="form-control" id="name" name="name" value="<?php echo $user['name']; ?>" readonly required>
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="<?php echo $user['email']; ?>" required>
+            <input type="email" class="form-control" id="email" name="email" value="<?php echo $user['email']; ?>" readonly required>
           </div>
-          <button type="submit" class="btn btn-primary" name="update_profile">Update Profile</button>
+          <button type="button" class="btn btn-primary" id="edit_button">Edit Details</button>
+          <button type="submit" class="btn btn-success" id="update_button" name="update_profile" style="display: none;">Update Details</button>
         </form>
       </div>
 
@@ -119,6 +123,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    document.getElementById("edit_button").addEventListener("click", function() {
+      document.getElementById("name").readOnly = false;
+      document.getElementById("email").readOnly = false;
+      document.getElementById("edit_button").style.display = "none";
+      document.getElementById("update_button").style.display = "block";
+    });
+  </script>
 </body>
 </html>
 
