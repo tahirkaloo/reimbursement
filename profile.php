@@ -58,7 +58,7 @@ if (isset($_POST['change_password'])) {
             $updateStmt->execute();
 
             // Redirect to the profile page with a success message
-            header("Location: index.php?password_changed=true");
+            header("Location: profile.php?password_changed=true");
             exit;
         } else {
             // Display an error message if the current password is incorrect
@@ -79,28 +79,17 @@ if (isset($_POST['change_password'])) {
 <html>
 <head>
     <title>User Profile</title>
-    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* Additional CSS styles for profile page */
-        body {
+        /* CSS styles for the profile page */
+        body.profile-page {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        .navbar {
-            background-color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            color: #fff;
-        }
-
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            margin-right: 20px;
         }
 
         .container {
@@ -145,36 +134,40 @@ if (isset($_POST['change_password'])) {
         }
     </style>
 </head>
-<body>
-<!-- Navigation -->
-<?php include "navbar.php"; ?>
+<body class="profile-page">
+    <div id="navbar"></div>
+    <script>
+    $(function(){
+        $("#navbar").load("navbar.php");
+    });
+    </script>
 
-<div class="container">
-    <h2>User Profile</h2>
-    <p>Welcome, <?php echo $username; ?>!</p>
+    <div class="container">
+        <h2>User Profile</h2>
+        <p>Welcome, <?php echo $username; ?>!</p>
 
-    <?php if (isset($_GET['password_changed']) && $_GET['password_changed'] === "true"): ?>
-        <p class="success-message">Password changed successfully!</p>
-    <?php endif; ?>
-
-    <h3>Change Password</h3>
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-        <div class="form-group">
-            <label for="current_password">Current Password:</label>
-            <input type="password" name="current_password" id="current_password" required>
-        </div>
-        <div class="form-group">
-            <label for="new_password">New Password:</label>
-            <input type="password" name="new_password" id="new_password" required>
-        </div>
-        <?php if (isset($errorMessage)): ?>
-            <p class="error-message"><?php echo $errorMessage; ?></p>
+        <?php if (isset($_GET['password_changed']) && $_GET['password_changed'] === "true"): ?>
+            <p class="success-message">Password changed successfully!</p>
         <?php endif; ?>
-        <div class="form-group">
-            <button type="submit" name="change_password">Change Password</button>
-        </div>
-    </form>
-</div>
+
+        <h3>Change Password</h3>
+        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <div class="form-group">
+                <label for="current_password">Current Password:</label>
+                <input type="password" name="current_password" id="current_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">New Password:</label>
+                <input type="password" name="new_password" id="new_password" required>
+            </div>
+            <?php if (isset($errorMessage)): ?>
+                <p class="error-message"><?php echo $errorMessage; ?></p>
+            <?php endif; ?>
+            <div class="form-group">
+                <button type="submit" name="change_password">Change Password</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
 
