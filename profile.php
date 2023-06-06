@@ -73,6 +73,22 @@ if (isset($_POST['change_password'])) {
 
     $verifyStmt->close();
 }
+
+// Profile details update handling
+if (isset($_POST['update_details'])) {
+    $newUsername = $_POST['username'];
+    $newEmail = $_POST['email'];
+
+    // Update the user's details in the database
+    $updateQuery = "UPDATE users SET username = ?, email = ? WHERE user_id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("ssi", $newUsername, $newEmail, $userID);
+    $updateStmt->execute();
+
+    // Redirect to the profile page with a success message
+    header("Location: profile.php?details_updated=true");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -80,92 +96,57 @@ if (isset($_POST['change_password'])) {
 <head>
     <title>User Profile</title>
     <!-- CSS only -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        /* CSS styles for the profile page */
-        body.profile-page {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 40px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #6c63ff;
-            box-shadow: 0 0 10px rgba(108, 99, 255, 0.2);
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 5px;
-        }
-
-        .success-message {
-            color: green;
-            margin-top: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
-<body class="profile-page">
-    <div id="navbar"></div>
-    <script>
-    $(function(){
-        $("#navbar").load("navbar.php");
-    });
-    </script>
-
+<body>
+<!-- Navigation -->
+<?php include "navbar.php"; ?>
     <div class="container">
-        <h2>User Profile</h2>
-        <p>Welcome, <?php echo $username; ?>!</p>
+        <h1>User Profile</h1>
 
-        <?php if (isset($_GET['password_changed']) && $_GET['password_changed'] === "true"): ?>
-            <p class="success-message">Password changed successfully!</p>
+        <?php if (isset($_GET['password_changed']) && $_GET['password_changed'] === 'true') : ?>
+            <div class="alert alert-success" role="alert">
+                Password changed successfully!
+            </div>
         <?php endif; ?>
 
-        <h3>Change Password</h3>
-        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <?php if (isset($_GET['details_updated']) && $_GET['details_updated'] === 'true') : ?>
+            <div class="alert alert-success" role="alert">
+                Profile details updated successfully!
+            </div>
+        <?php endif; ?>
+
+        <h3>Welcome, <?php echo $username; ?></h3>
+
+        <h4>Profile Details</h4>
+        <form method="POST" action="profile.php">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" value="<?php echo $username; ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" required>
+            </div>
+            <button type="submit" class="btn btn-primary" name="update_details">Update Details</button>
+        </form>
+
+        <h4>Change Password</h4>
+        <form method="POST" action="profile.php">
             <div class="form-group">
                 <label for="current_password">Current Password:</label>
-                <input type="password" name="current_password" id="current_password" required>
+                <input type="password" class="form-control" id="current_password" name="current_password" required>
             </div>
             <div class="form-group">
                 <label for="new_password">New Password:</label>
-                <input type="password" name="new_password" id="new_password" required>
+                <input type="password" class="form-control" id="new_password" name="new_password" required>
             </div>
-            <?php if (isset($errorMessage)): ?>
-                <p class="error-message"><?php echo $errorMessage; ?></p>
+            <?php if (isset($errorMessage)) : ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $errorMessage; ?>
+                </div>
             <?php endif; ?>
-            <div class="form-group">
-                <button type="submit" name="change_password">Change Password</button>
-            </div>
+            <button type="submit" class="btn btn-primary" name="change_password">Change Password</button>
         </form>
     </div>
 </body>
