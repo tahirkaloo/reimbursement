@@ -198,7 +198,7 @@ if (isset($_POST['register'])) {
             <p class="success-message"><?php echo $successMessage; ?></p>
         <?php endif; ?>
     </form>
-    <p>Already have an account? <a href="login.php">Log in</a></p>
+    <p>Already .. have an account? <a href="login.php">Log in</a></p>
 </div>
 </body>
 </html>
