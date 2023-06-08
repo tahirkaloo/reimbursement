@@ -61,7 +61,7 @@ if (isset($_POST['register'])) {
                     // Add debug statements
                     $subject = "New Registration";
                     $message = "A new user has registered:\n\nName: $name\nEmail: $email";
-                    $command = "echo \"$message\" | /usr/local/bin/aws ses send-email --from admin@tahirkaloo.tk --to $email --subject \"$subject\" --text \"$message\"";
+                    $command = 'echo "' . addslashes($message) . '" | /usr/bin/aws ses send-email --region us-east-1 --from admin@tahirkaloo.tk --to ' . addslashes($email) . ' --subject "' . addslashes($subject) . '" --text "' . addslashes($message) . '"';
                     $output = shell_exec($command);
                     error_log("Command: $command");
                     error_log("Output: $output");
@@ -83,6 +83,7 @@ if (isset($_POST['register'])) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>
