@@ -58,13 +58,13 @@ if (isset($_POST['register'])) {
                 if ($result) {
                     $successMessage = "Registration successful. You can now log in.";
 
-                    // Send email using AWS SES
-                    $subject = "Registration Confirmation";
-                    $message = "Dear $name,\n\nThank you for registering. Your account has been created successfully.";
-
-                    // Execute AWS CLI command to send email
-                    $command = "aws ses send-email --from admin@tahirkaloo.tk --to $email --subject \"$subject\" --text \"$message\"";
+                    // Add debug statements
+                    $subject = "New Registration";
+                    $message = "A new user has registered:\n\nName: $name\nEmail: $email";
+                    $command = "echo \"$message\" | /usr/local/bin/aws ses send-email --from admin@tahirkaloo.tk --to $email --subject \"$subject\" --text \"$message\"";
                     $output = shell_exec($command);
+                    error_log("Command: $command");
+                    error_log("Output: $output");
                 } else {
                     $errorMessage = "Something went wrong. Please try again later.";
                     error_log("Error executing prepared statement: " . mysqli_error($conn));
