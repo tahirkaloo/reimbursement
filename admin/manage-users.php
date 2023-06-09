@@ -100,13 +100,25 @@ function getUserEmail($userId)
 }
 
 // Helper function to send email
+// Helper function to send email
 function sendEmail($email, $password)
 {
-    // Implement your own logic to send the email
-    // Replace the following code with your own logic
+    // Construct the AWS CLI command to send the email
     $subject = "Password Reset";
     $message = "Your new password: $password";
-    mail($email, $subject, $message);
+    $senderEmail = "your_email@example.com"; // Replace with your sender email address
+    $awsCliCommand = "aws ses send-email --from $senderEmail --to $email --subject \"$subject\" --text \"$message\"";
+
+    // Execute the AWS CLI command
+    exec($awsCliCommand, $output, $returnCode);
+
+    // Check if the command executed successfully
+    if ($returnCode === 0) {
+        echo "Email sent successfully!";
+    } else {
+        echo "Failed to send email.";
+        // You can handle the failure scenario based on your requirements
+    }
 }
 ?>
 
@@ -201,9 +213,9 @@ function sendEmail($email, $password)
                             <div class="dropdown" id="dropdown-<?php echo $user['user_id']; ?>">
                                 <button class="btn-action"><?php echo $user['role']; ?></button>
                                 <div class="dropdown-content">
-				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'admin')">Admin</div>
-				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'Finance')">Finance</div>
-				    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'manager')">Manager</div>
+                                    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'admin')">Admin</div>
+                                    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'Finance')">Finance</div>
+                                    <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'manager')">Manager</div>
                                     <div class="dropdown-option" onclick="changeRole(<?php echo $user['user_id']; ?>, 'user')">User</div>
                                 </div>
                             </div>
