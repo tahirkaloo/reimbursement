@@ -1,10 +1,17 @@
 <?php
 session_start();
+
+// AWS SES configuration
+$awsRegion = 'us-east-1'; // Replace with your AWS region
+$senderEmail = 'admin@tahirkaloo.tk'; // Replace with your sender email
+
+// Include the database connection
 require_once 'db_connect.php';
 
-// Do reporting
+// Error reporting and timezone settings
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+date_default_timezone_set('America/New_York'); // Replace 'America/New_York' with your desired timezone
 
 // Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
@@ -45,45 +52,50 @@ if (isset($_POST['register'])) {
             $error = true;
             $errorMessage = "User with this email already exists.";
         } else {
+            // Generate a unique verification token
+            $verificationToken = bin2hex(openssl_random_pseudo_bytes(16));
+
+            // Set the expiration time for the verification token (e.g., 1 hour from now)
+            $verificationTokenExpiration = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
             // Hash the password using md5()
             $hashedPassword = md5($password);
 
             // Prepare the SQL statement
-            $stmt = mysqli_prepare($conn, "INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+            $stmt = mysqli_prepare($conn, "INSERT INTO users (username, email, password, verification_token, verification_token_expiration) VALUES (?, ?, ?, ?, ?)");
             if ($stmt) {
                 // Bind parameters and execute the statement
-                mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hashedPassword);
+                mysqli_stmt_bind_param($stmt, "sssss", $name, $email, $hashedPassword, $verificationToken, $verificationTokenExpiration);
                 $result = mysqli_stmt_execute($stmt);
 
                 if ($result) {
-                    $successMessage = "Registration successful. You can now log in.";
+                    $successMessage = "Registration successful. Please check your email to verify your account.";
 
-                    // Add debug statements
-                    $subject = "New Registration";
-                    $message = "A new user has registered:\n\nName: $name\nEmail: $email";
-                    $command = 'echo "' . addslashes($message) . '" | /usr/bin/aws ses send-email --region us-east-1 --from admin@tahirkaloo.tk --to ' . addslashes($email) . ' --subject "' . addslashes($subject) . '" --text "' . addslashes($message) . '"';
-                    $output = shell_exec($command);
-                    error_log("Command: $command");
-                    error_log("Output: $output");
+                    // Send verification email
+                    $subject = "Account Verification";
+                    $message = "Thank you for registering. Please click the link below to verify your account:\n\n";
+                    $message .= "http://tahirkaloo.tk/login.php?email=" . urlencode($email) . "&token=" . urlencode($verificationToken);
+
+                    // Use AWS CLI to send the email
+                    $awsCommand = 'aws ses send-email --region ' . escapeshellarg($awsRegion) . ' --from ' . escapeshellarg($senderEmail) . ' --to ' . escapeshellarg($email) . ' --subject ' . escapeshellarg($subject) . ' --text ' . escapeshellarg($message);
+                    exec($awsCommand, $output, $returnVar);
+
+                    if ($returnVar !== 0) {
+                        $error = true;
+                        $errorMessage = "Registration failed. Please try again.";
+                    }
                 } else {
-                    $errorMessage = "Something went wrong. Please try again later.";
-                    error_log("Error executing prepared statement: " . mysqli_error($conn));
+                    $error = true;
+                    $errorMessage = "Registration failed. Please try again.";
                 }
-
-                // Close the statement
-                mysqli_stmt_close($stmt);
             } else {
-                $errorMessage = "Something went wrong. Please try again later.";
-                error_log("Error preparing statement: " . mysqli_error($conn));
+                $error = true;
+                $errorMessage = "Registration failed. Please try again.";
             }
         }
-
-        // Close the check statement
-        mysqli_stmt_close($checkStmt);
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -176,31 +188,32 @@ if (isset($_POST['register'])) {
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
         <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" name="name" id="name" required>
+            <input type="text" name="name" id="name" value="<?php echo isset($_POST['name']) ? $_POST['name'] : ''; ?>" />
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" required>
+            <input type="email" name="email" id="email" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>" />
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
+            <input type="password" name="password" id="password" />
         </div>
         <div class="form-group">
             <label for="confirm_password">Confirm Password:</label>
-            <input type="password" name="confirm_password" id="confirm_password" required>
+            <input type="password" name="confirm_password" id="confirm_password" />
         </div>
         <div class="form-group">
             <button type="submit" name="register">Register</button>
         </div>
         <?php if ($error): ?>
-            <p class="error-message"><?php echo $errorMessage; ?></p>
-        <?php elseif ($successMessage): ?>
-            <p class="success-message"><?php echo $successMessage; ?></p>
+            <div class="error-message"><?php echo $errorMessage; ?></div>
+        <?php endif; ?>
+        <?php if ($successMessage): ?>
+            <div class="success-message"><?php echo $successMessage; ?></div>
         <?php endif; ?>
     </form>
-    <p>Already have an account? <a href="login.php">Log in</a></p>
 </div>
+
 </body>
 </html>
 

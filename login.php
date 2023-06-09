@@ -2,85 +2,133 @@
 session_start();
 require_once 'db_connect.php';
 
+// Set the timezone
+date_default_timezone_set('UTC');
+
+
+// Do reporting
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 // Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.html");
+    header("Location: index.html"); // Redirect to the home page or any other desired page
     exit;
 }
 
 $error = false;
 $errorMessage = '';
 
+// Check if the login form is submitted
 if (isset($_POST['login'])) {
+    // Get the form inputs
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
+    // Validate the form inputs
     if (empty($email) || empty($password)) {
         $error = true;
-        $errorMessage = "Email and password are required.";
-    } elseif (isset($_POST['resetPassword'])) {
-        // Handle password reset request
-        $query = "SELECT user_id FROM users WHERE email = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows == 1) {
-            // Generate a new password
-            $newPassword = generateRandomPassword(); // Implement your own logic to generate a new password
-
-            // Update the user's password in the database
-            $hashedPassword = md5($newPassword); // Hash the new password using md5()
-            $stmt->bind_result($userId);
-            $stmt->fetch();
-            $stmt->close();
-
-            $updateQuery = "UPDATE users SET password = ? WHERE user_id = ?";
-            $updateStmt = $conn->prepare($updateQuery);
-            $updateStmt->bind_param("si", $hashedPassword, $userId);
-            $updateStmt->execute();
-            $updateStmt->close();
-
-            // Send the new password to the user via email or any other method
-            $subject = "Password Reset";
-            $message = "Your new password: $newPassword";
-            // Send the email using your preferred email sending method
-            // Replace the following code with your own logic
-            mail($email, $subject, $message);
-
-            $successMessage = "Your password has been reset. Please check your email for the new password.";
-        } else {
-            $error = true;
-            $errorMessage = "Invalid email. Please try again.";
-        }
+        $errorMessage = "All fields are required.";
     } else {
-        // Authenticate the user
-        $stmt = mysqli_prepare($conn, "SELECT user_id, email, password, role FROM users WHERE email = ?");
+        // Check if the user exists in the database
+        $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE email = ?");
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-        if (mysqli_stmt_num_rows($stmt) == 1) {
-            mysqli_stmt_bind_result($stmt, $userId, $fetchedEmail, $hashedPassword, $role);
-            mysqli_stmt_fetch($stmt);
+        if (mysqli_num_rows($result) == 1) {
+            $user = mysqli_fetch_assoc($result);
 
-            if (md5($password) === $hashedPassword) {
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['role'] = $role;
-                header("Location: index.html");
-                exit;
+            // Check if the user is verified
+            if ($user['is_verified']) {
+                // Verify the password
+                if (md5($password) == $user['password']) {
+                    // Set session variables
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
+
+                    // Redirect to the home page or any other desired page
+                    header("Location: index.html");
+                    exit;
+                } else {
+                    $error = true;
+                    $errorMessage = "Invalid email or password.";
+                }
             } else {
                 $error = true;
-                $errorMessage = "Invalid email or password.";
+                $errorMessage = "Your email is not verified. Please check your email for verification instructions.";
             }
         } else {
             $error = true;
             $errorMessage = "Invalid email or password.";
         }
 
+        // Close the statement
         mysqli_stmt_close($stmt);
     }
+}
+
+// Check if a valid and unused token ID is present in the URL
+if (isset($_GET['token'])) {
+    $token = mysqli_real_escape_string($conn, $_GET['token']);
+
+    // Verify the token in the database
+    $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE verification_token = ? AND is_verified = 0 AND token_expiration > NOW()");
+    mysqli_stmt_bind_param($stmt, "s", $token);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (mysqli_num_rows($result) == 1) {
+        $user = mysqli_fetch_assoc($result);
+
+        // Mark the user as verified
+        $stmt = mysqli_prepare($conn, "UPDATE users SET is_verified = 1 WHERE user_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $user['user_id']);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
+        // Set session variables
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+
+        // Redirect to the home page or any other desired page
+        header("Location: index.html");
+        exit;
+    }
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+}
+
+// Resend verification email
+if (isset($_POST['resend'])) {
+    // Get the form input
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+
+    // Generate a new verification token
+    $verificationToken = bin2hex(openssl_random_pseudo_bytes(16));
+
+    // Set the expiration time for the verification token (e.g., 24 hours from now)
+    $verificationTokenExpiration = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+    // Update the verification token in the database
+    $stmt = mysqli_prepare($conn, "UPDATE users SET verification_token = ?, token_expiration = ? WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, "sss", $verificationToken, $verificationTokenExpiration, $email);
+    mysqli_stmt_execute($stmt);
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+
+    // Send the verification email
+    $subject = "Account Verification";
+    $message = "Please click the following link to verify your email: http://tahirkaloo.tk/login.php?token=" . urlencode($verificationToken);
+    $command = 'aws ses send-email --region us-east-1 --from admin@tahirkaloo.tk --to ' . $email . ' --subject "' . $subject . '" --text "' . $message . '"';
+    exec($command);
+
+    // Display success message
+    $errorMessage = "Verification email has been resent. Please check your email.";
 }
 ?>
 
@@ -109,7 +157,11 @@ if (isset($_POST['login'])) {
         .navbar a {
             color: #fff;
             text-decoration: none;
-            margin-right: 20px;
+            margin-left: 10px;
+        }
+
+        .navbar a:first-child {
+            margin-left: 0;
         }
 
         .container {
@@ -148,48 +200,49 @@ if (isset($_POST['login'])) {
             margin-top: 5px;
         }
 
-        .success-message {
-            color: green;
-            margin-top: 5px;
+        .resend-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #6c63ff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-<!-- Login Navbar -->
 <div class="navbar">
-    <div>
-        <a href="index.html">Home</a>
-    </div>
-    <div>
-        <a href="register.php">Register</a>
-        <a href="login.php">Login</a>
-    </div>
+    <a href="index.html">Home</a>
+    <a href="register.php">Register</a>
 </div>
-
 <div class="container">
     <h2>Login</h2>
-    <?php if ($error): ?>
-        <p class="error-message"><?php echo $errorMessage; ?></p>
-    <?php elseif (isset($successMessage)): ?>
-        <p class="success-message"><?php echo $successMessage; ?></p>
-    <?php endif; ?>
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" autocomplete="off">
+        <?php if ($error) { ?>
+            <div class="error-message"><?php echo $errorMessage; ?></div>
+        <?php } ?>
         <div class="form-group">
-            <label for="email">Email:</label>
+            <label for="email">Email</label>
             <input type="email" name="email" id="email" required>
         </div>
         <div class="form-group">
-            <label for="password">Password:</label>
+            <label for="password">Password</label>
             <input type="password" name="password" id="password" required>
         </div>
         <div class="form-group">
-            <button type="submit" name="login">Login</button>
-        </div>
-        <div class="form-group">
-            <button type="submit" name="resetPassword">Reset Password</button>
+            <input type="submit" name="login" value="Login">
         </div>
     </form>
-    <p>Don't have an account? <a href="register.php">Register</a></p>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <input type="submit" name="resend" value="Resend Verification Email" class="resend-button">
+        </div>
+    </form>
 </div>
 </body>
 </html>
