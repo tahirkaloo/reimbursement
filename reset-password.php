@@ -117,6 +117,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0;
         }
 
+	.navbar {
+            background-color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -163,6 +178,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+<!-- Reset Password Navbar -->
+<div class="navbar">
+    <div>
+        <a href="index.html">Home</a>
+    </div>
+    <div>
+        <a href="register.php">Register</a>
+        <a href="login.php">Login</a>
+    </div>
+</div>
+
     <div class="container">
         <h2>Reset Password</h2>
         <?php if ($successMessage !== ''): ?>
