@@ -108,31 +108,14 @@ if (isset($_POST['register'])) {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        .navbar {
-            background-color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            color: #fff;
-        }
-
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 10px;
-        }
-
-        .navbar a:first-child {
-            margin-left: 0;
+            background-color: #f2f2f2;
         }
 
         .container {
             max-width: 400px;
             margin: 0 auto;
             padding: 40px;
+            background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
@@ -173,18 +156,20 @@ if (isset($_POST['register'])) {
 </head>
 <body>
 <!-- Login Navbar -->
-<div class="navbar">
-    <div>
-        <a href="index.html">Home</a>
-    </div>
-    <div>
-        <a href="register.php">Register</a>
-        <a href="login.php">Login</a>
+<div style="background-color: #333; padding: 10px; color: #fff;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="index.html" style="color: #fff; text-decoration: none;">Home</a>
+        </div>
+        <div>
+            <a href="register.php" style="color: #fff; text-decoration: none;">Register</a>
+            <a href="login.php" style="color: #fff; text-decoration: none;">Login</a>
+        </div>
     </div>
 </div>
 
 <div class="container">
-    <h2>Registration</h2>
+    <h2 style="text-align: center;">Registration</h2>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
         <div class="form-group">
             <label for="name">Name:</label>
@@ -203,7 +188,7 @@ if (isset($_POST['register'])) {
             <input type="password" name="confirm_password" id="confirm_password" />
         </div>
         <div class="form-group">
-            <button type="submit" name="register">Register</button>
+            <button type="submit" name="register" style="padding: 10px 20px; background-color: #6c63ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Register</button>
         </div>
         <?php if ($error): ?>
             <div class="error-message"><?php echo $errorMessage; ?></div>
