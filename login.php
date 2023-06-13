@@ -122,7 +122,8 @@ if (isset($_POST['resend'])) {
 
     // Send the verification email
     $subject = "Account Verification";
-    $message = "Please click the following link to verify your email: http://tahirkaloo.tk/login.php?token=" . urlencode($verificationToken);
+    $verificationLink = "http://tahirkaloo.tk/login.php?token=" . urlencode($verificationToken);
+    $message = "Please click the following link to verify your email: " . $verificationLink;
     $command = 'aws ses send-email --region us-east-1 --from admin@tahirkaloo.tk --to ' . $email . ' --subject "' . $subject . '" --text "' . $message . '"';
     exec($command);
 
@@ -211,38 +212,40 @@ if (isset($_POST['resend'])) {
     </style>
 </head>
 <body>
-<div class="navbar">
-    <a href="index.html">Home</a>
-    <a href="register.php">Register</a>
-</div>
-<div class="container">
-    <h2>Login</h2>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" autocomplete="off">
-        <?php if ($error) { ?>
-            <div class="error-message"><?php echo $errorMessage; ?></div>
-        <?php } ?>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" required>
-        </div>
-        <div class="form-group">
-            <input type="submit" name="login" value="Login">
-        </div>
-    </form>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" required>
-        </div>
-        <div class="form-group">
-            <input type="submit" name="resend" value="Resend Verification Email" class="resend-button">
-        </div>
-    </form>
-</div>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="register.html">Register</a>
+    </div>
+    <div class="container">
+        <h2>Login</h2>
+        <?php
+        if ($error) {
+            echo '<div class="error-message">' . $errorMessage . '</div>';
+        }
+        ?>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="login" value="Login">
+            </div>
+        </form>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="resend" value="Resend Verification Email" class="resend-button">
+            </div>
+        </form>
+    </div>
 </body>
 </html>
 
