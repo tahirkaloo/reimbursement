@@ -5,7 +5,6 @@ require_once 'db_connect.php';
 // Set the timezone
 date_default_timezone_set('UTC');
 
-
 // Do reporting
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -18,6 +17,39 @@ if (isset($_SESSION['user_id'])) {
 
 $error = false;
 $errorMessage = '';
+
+// Check if a valid and unused token ID is present in the URL
+if (isset($_GET['token'])) {
+    $token = mysqli_real_escape_string($conn, $_GET['token']);
+
+    // Verify the token in the database
+    $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE reset_token = ? AND is_verified = 0 AND reset_token_expiration > NOW()");
+    mysqli_stmt_bind_param($stmt, "s", $token);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (mysqli_num_rows($result) == 1) {
+        $user = mysqli_fetch_assoc($result);
+
+        // Mark the user as verified
+        $stmt = mysqli_prepare($conn, "UPDATE users SET is_verified = 1, reset_token = NULL, reset_token_expiration = NULL WHERE user_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $user['user_id']);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
+        // Set session variables
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+
+        // Redirect to the home page or any other desired page
+        header("Location: index.html");
+        exit;
+    }
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+}
 
 // Check if the login form is submitted
 if (isset($_POST['login'])) {
@@ -69,39 +101,6 @@ if (isset($_POST['login'])) {
     }
 }
 
-// Check if a valid and unused token ID is present in the URL
-if (isset($_GET['token'])) {
-    $token = mysqli_real_escape_string($conn, $_GET['token']);
-
-    // Verify the token in the database
-    $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE verification_token = ? AND is_verified = 0 AND token_expiration > NOW()");
-    mysqli_stmt_bind_param($stmt, "s", $token);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
-
-        // Mark the user as verified
-        $stmt = mysqli_prepare($conn, "UPDATE users SET is_verified = 1 WHERE user_id = ?");
-        mysqli_stmt_bind_param($stmt, "i", $user['user_id']);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-
-        // Set session variables
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-
-        // Redirect to the home page or any other desired page
-        header("Location: index.html");
-        exit;
-    }
-
-    // Close the statement
-    mysqli_stmt_close($stmt);
-}
-
 // Resend verification email
 if (isset($_POST['resend'])) {
     // Get the form input
@@ -114,7 +113,7 @@ if (isset($_POST['resend'])) {
     $verificationTokenExpiration = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
     // Update the verification token in the database
-    $stmt = mysqli_prepare($conn, "UPDATE users SET verification_token = ?, token_expiration = ? WHERE email = ?");
+    $stmt = mysqli_prepare($conn, "UPDATE users SET reset_token = ?, reset_token_expiration = ? WHERE email = ?");
     mysqli_stmt_bind_param($stmt, "sss", $verificationToken, $verificationTokenExpiration, $email);
     mysqli_stmt_execute($stmt);
 
