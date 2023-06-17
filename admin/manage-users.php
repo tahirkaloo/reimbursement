@@ -100,13 +100,12 @@ function getUserEmail($userId)
 }
 
 // Helper function to send email
-// Helper function to send email
 function sendEmail($email, $password)
 {
     // Construct the AWS CLI command to send the email
     $subject = "Password Reset";
     $message = "Your new password: $password";
-    $senderEmail = "your_email@example.com"; // Replace with your sender email address
+    $senderEmail = "admin@tahirkaloo.tk"; // Replace with your sender email address
     $awsCliCommand = "aws ses send-email --from $senderEmail --to $email --subject \"$subject\" --text \"$message\"";
 
     // Execute the AWS CLI command

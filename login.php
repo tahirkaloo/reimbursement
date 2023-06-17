@@ -18,6 +18,19 @@ if (isset($_SESSION['user_id'])) {
 $error = false;
 $errorMessage = '';
 
+// Function to log in the user
+function loginUser($user)
+{
+    // Set session variables
+    $_SESSION['user_id'] = $user['user_id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role'] = $user['role'];
+
+    // Redirect to the home page or any other desired page
+    header("Location: index.html");
+    exit;
+}
+
 // Check if a valid and unused token ID is present in the URL
 if (isset($_GET['token'])) {
     $token = mysqli_real_escape_string($conn, $_GET['token']);
@@ -31,20 +44,14 @@ if (isset($_GET['token'])) {
     if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
 
-        // Mark the user as verified
+        // Mark the user as verified and reset token information
         $stmt = mysqli_prepare($conn, "UPDATE users SET is_verified = 1, reset_token = NULL, reset_token_expiration = NULL WHERE user_id = ?");
         mysqli_stmt_bind_param($stmt, "i", $user['user_id']);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
 
-        // Set session variables
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-
-        // Redirect to the home page or any other desired page
-        header("Location: index.html");
-        exit;
+        // Log in the user
+        loginUser($user);
     }
 
     // Close the statement
@@ -75,14 +82,8 @@ if (isset($_POST['login'])) {
             if ($user['is_verified']) {
                 // Verify the password
                 if (md5($password) == $user['password']) {
-                    // Set session variables
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['role'] = $user['role'];
-
-                    // Redirect to the home page or any other desired page
-                    header("Location: index.html");
-                    exit;
+                    // Log in the user
+                    loginUser($user);
                 } else {
                     $error = true;
                     $errorMessage = "Invalid email or password.";
@@ -100,37 +101,8 @@ if (isset($_POST['login'])) {
         mysqli_stmt_close($stmt);
     }
 }
-
-// Resend verification email
-if (isset($_POST['resend'])) {
-    // Get the form input
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-
-    // Generate a new verification token
-    $verificationToken = bin2hex(openssl_random_pseudo_bytes(16));
-
-    // Set the expiration time for the verification token (e.g., 24 hours from now)
-    $verificationTokenExpiration = date('Y-m-d H:i:s', strtotime('+24 hours'));
-
-    // Update the verification token in the database
-    $stmt = mysqli_prepare($conn, "UPDATE users SET reset_token = ?, reset_token_expiration = ? WHERE email = ?");
-    mysqli_stmt_bind_param($stmt, "sss", $verificationToken, $verificationTokenExpiration, $email);
-    mysqli_stmt_execute($stmt);
-
-    // Close the statement
-    mysqli_stmt_close($stmt);
-
-    // Send the verification email
-    $subject = "Account Verification";
-    $verificationLink = "http://tahirkaloo.tk/login.php?token=" . urlencode($verificationToken);
-    $message = "Please click the following link to verify your email: " . $verificationLink;
-    $command = 'aws ses send-email --region us-east-1 --from admin@tahirkaloo.tk --to ' . $email . ' --subject "' . $subject . '" --text "' . $message . '"';
-    exec($command);
-
-    // Display success message
-    $errorMessage = "Verification email has been resent. Please check your email.";
-}
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -214,7 +186,7 @@ if (isset($_POST['resend'])) {
 <body>
     <div class="navbar">
         <a href="index.html">Home</a>
-        <a href="register.html">Register</a>
+        <a href="register.php">Register</a>
     </div>
     <div class="container">
         <h2>Login</h2>
@@ -234,15 +206,6 @@ if (isset($_POST['resend'])) {
             </div>
             <div class="form-group">
                 <input type="submit" name="login" value="Login">
-            </div>
-        </form>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <input type="submit" name="resend" value="Resend Verification Email" class="resend-button">
             </div>
         </form>
     </div>
