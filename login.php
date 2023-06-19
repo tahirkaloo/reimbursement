@@ -176,15 +176,15 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
             margin-top: 5px;
         }
 
-        .resend-button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 5px 10px;
-            background-color: #6c63ff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
+	.resetpassword-button {
+    	    display: inline-block;
+    	    margin-top: 10px;
+    	    padding: 5px 10px;
+    	    background-color: #6c63ff;
+    	    color: #fff;
+    	    text-decoration: none;
+    	    border-radius: 10px;
+	}
     </style>
 </head>
 <body>
@@ -211,7 +211,10 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
             <div class="form-group">
                 <input type="submit" name="login" value="Login">
             </div>
-        </form>
+	</form>
+	<div class="resetpassword.button">
+            <a href="reset-password.php">Forgot Password? Reset it here</a>
+        </div>
     </div>
 </body>
 </html>
