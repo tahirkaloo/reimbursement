@@ -44,7 +44,7 @@
     <div class="admin-navbar">
         <div class="logo">
             <a href="admin_dashboard.php">
-                <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/hanover.jpg" alt="Logo">
+                <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Logo+files/logo-white.png" alt="Logo">
             </a>
         </div>
         <div class="menu">
