@@ -149,6 +149,16 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
             background-color: #fff;
         }
 
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 100px;
+            height: auto;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -163,15 +173,14 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 5px;
-            transition: border-color 0.3s ease;
+            background-color: #f5f5f5;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #6c63ff;
-            box-shadow: 0 0 10px rgba(108, 99, 255, 0.2);
+            background-color: #e1e1e1;
         }
 
         .error-message {
@@ -179,38 +188,39 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
             margin-top: 5px;
         }
 
-        .resetpassword-button {
-            display: inline-block;
+        .login-button {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
             margin-top: 20px;
-            padding: 10px 20px;
             background-color: #6c63ff;
             color: #fff;
+            text-align: center;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
 
-        .resetpassword-button:hover {
+        .login-button:hover {
             background-color: #524bc7;
         }
 
+        .login-button:not(:hover) {
+            background-color: #6c63ff; /* Change the background color when not hovering */
+        }
+
+        .resetpassword-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .resetpassword-button a {
-            color: #fff;
+            color: #6c63ff;
             text-decoration: none;
         }
 
         .resetpassword-button a:hover {
             text-decoration: underline;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo img {
-            width: 100px;
-            height: auto;
         }
     </style>
 </head>
@@ -223,7 +233,7 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
         <div class="logo">
             <img src="https://reimbursement-instance-bucket.s3.amazonaws.com/Logo+files/logo-black.png" alt="Logo">
         </div>
-        <h2>Login</h2>
+        <h2 style="text-align: center; color: #6c63ff;">Login</h2>
         <?php
         if ($error) {
             echo '<div class="error-message">' . $errorMessage . '</div>';
@@ -239,7 +249,7 @@ if (isset($_GET['email']) && isset($_GET['code'])) {
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </div>
             <div class="form-group">
-                <input type="submit" name="login" value="Login">
+                <input type="submit" name="login" value="Login" class="login-button">
             </div>
         </form>
         <div class="resetpassword-button">
